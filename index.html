@@ -142,8 +142,8 @@ section { overflow-x: clip; }
       background: transparent;
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
-      color: var(--bg);
-      border-color: color-mix(in srgb, var(--bg) 35%, transparent);
+      color: var(--ink);
+      border-color: var(--line);
       box-shadow: none;
     }
 
@@ -166,7 +166,7 @@ section { overflow-x: clip; }
     }
 
     .menu {
-      position: fixed; inset: 0; z-index: 40; background: var(--ink); color: var(--bg);
+      position: fixed; inset: 0; z-index: 40; background: var(--bg); color: var(--ink);
       display: flex; flex-direction: column; justify-content: space-between;
       padding: calc(env(safe-area-inset-top, 0px) + 104px) clamp(22px, 6vw, 48px) calc(env(safe-area-inset-bottom, 0px) + 32px);
       clip-path: circle(0px at var(--ox, 100%) var(--oy, 0));
@@ -187,7 +187,7 @@ section { overflow-x: clip; }
       transition: opacity .5s, transform .8s var(--ease), padding .3s;
     }
     .menu nav a small {
-      font: 500 14px "Schibsted Grotesk", system-ui, sans-serif; letter-spacing: 0; color: #8A93FF;
+      font: 500 14px "Schibsted Grotesk", system-ui, sans-serif; letter-spacing: 0; color: var(--acc);
     }
     .menu.open nav a {
       opacity: 1; transform: none;
