@@ -39,11 +39,15 @@
       scroll-behavior: smooth;
       scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 90px);
     }
+    /* FIX: replace body overflow-x hidden with clip on html/body/main/footer */
+    html, body { max-width: 100%; overflow-x: clip; touch-action: pan-y pinch-zoom; }
+section { overflow-x: clip; }
     body {
       margin: 0; background: var(--bg); color: var(--ink);
       font: 400 17px/1.6 "Schibsted Grotesk", system-ui, sans-serif;
-      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
+    main, footer { overflow-x: clip; }
     body::before {
       content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
       background: var(--bg); z-index: 10;
@@ -63,10 +67,10 @@
     }
     header.hide { transform: translateY(-140%); }
 
-/* Desktop: navbar always stays pinned. Mobile (820px and below) keeps hide-on-scroll. */
-      @media (min-width: 821px) {
-        header.hide { transform: none; }
-      }
+    /* Desktop: navbar always stays pinned. Mobile (820px and below) keeps hide-on-scroll. */
+    @media (min-width: 821px) {
+      header.hide { transform: none; }
+    }
     .nav {
       pointer-events: auto; max-width: 1180px; margin: 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
@@ -281,8 +285,10 @@
     }
     .statement span { color: var(--line); transition: color .35s; }
     .statement span.on { color: var(--ink); }
+    /* FIX: grid blow-out — use min() so columns can shrink below 270px/220px */
     .facts {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
       gap: 32px; margin-top: clamp(40px, 6vw, 72px);
     }
     .facts h3 { font: 600 16px "Schibsted Grotesk", system-ui, sans-serif; margin: 0 0 8px; }
@@ -557,8 +563,10 @@
     }
     .mq.rev span { color: var(--ink); -webkit-text-stroke: 0; }
     @keyframes mq { to { transform: translateX(-50%); } }
+    /* FIX: grid blow-out — min() so it can shrink below 270px */
     .sk {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
       gap: 20px; margin-top: clamp(40px, 6vw, 72px);
     }
     .card {
@@ -1206,7 +1214,6 @@
     .totop:hover .tt-arr.b { transform: none; }
     .tt-label { font-size: 15px; color: var(--mut); transition: color .3s, letter-spacing .45s var(--ease); }
 
-
     /* floating button with scroll-progress ring */
     .totop.fab {
       position: fixed; right: clamp(16px, 3vw, 32px); bottom: calc(28px + env(safe-area-inset-bottom, 0px));
@@ -1289,7 +1296,8 @@
         height: 100%;
         object-fit: contain; /* Shows the full image without cropping */
       }
-      .pin { grid-template-columns: 1fr; }
+      /* FIX: replace 1fr with minmax(0, 1fr) for .pin */
+      .pin { grid-template-columns: minmax(0, 1fr); }
       .shot { grid-column: 1; grid-row: auto; order: -1; padding-right: 10px; }
       .frame { box-shadow: 8px 8px 0 var(--acc) !important; }
       .hero-foot { flex-direction: column; align-items: center; text-align: center; }
@@ -1297,14 +1305,19 @@
       .tl { --lx: 7px; }
       .ti { grid-template-columns: 1fr; padding-left: 38px; row-gap: 8px; }
       .fg { grid-template-columns: 1fr; }
+      /* FIX: .status white-space normal */
+      .status { white-space: normal; }
     }
     @media (max-width: 760px) {
       .story { grid-template-columns: 1fr; }
       .story > .rv:nth-child(even) { margin-top: 0; }
     }
+    /* FIX: .tm-form grid blow-out — use minmax(0, 1fr) at mobile */
     @media (max-width: 860px) {
-      .tm-form { grid-template-columns: 1fr; }
+      .tm-form { grid-template-columns: minmax(0, 1fr); }
       .tm-form > .pv { grid-column: 1; grid-row: auto; }
+      /* FIX: .cs-stage margin-inline for rotated cert stack */
+      .cs-stage { margin-inline: 14px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *:not(.mq-t):not(.totop):not(.totop *):not(#shutter):not(#shutter *) {
@@ -1323,29 +1336,15 @@
 
     /* =========================================================
        CIRCULAR THEME TRANSITION (VIEW TRANSITIONS API)
+       FIXED: removed old keyframe approach, use JS-driven clip-path
        ========================================================= */
-    @keyframes reveal-in {
-      from { clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%)); }
-      to   { clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%)); }
-    }
-    @keyframes reveal-out {
-      from { clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%)); }
-      to   { clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%)); }
-    }
+    ::view-transition-old(root),
     ::view-transition-new(root) {
-      animation: reveal-in 0.5s ease-in-out forwards;
-      z-index: 1;
+      animation: none;
       mix-blend-mode: normal;
     }
-    ::view-transition-old(root) {
-      animation: reveal-out 0.5s ease-in-out forwards;
-      animation-delay: .5s;
-      z-index: 0;
-      mix-blend-mode: normal;
-    }
-    ::view-transition-image-pair(root) {
-      isolation: isolate;
-    }
+    ::view-transition-old(root) { z-index: 0; }
+    ::view-transition-new(root) { z-index: 1; }
   </style>
 </head>
 <body>
@@ -2131,6 +2130,7 @@
 
     /* =========================================================
        THEME: circular reveal using the View Transitions API.
+       FIXED: JS-driven clip-path animation, no old keyframes, uses .vt class
        ========================================================= */
     const isDark = () => root.dataset.theme
       ? root.dataset.theme === "dark"
@@ -2143,19 +2143,26 @@
       try { localStorage.setItem("theme", next); } catch (e) {}
     }
 
-    $("#theme").addEventListener("click", (e) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
+    $("#theme").addEventListener("click", e => {
+      const r = e.currentTarget.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
 
-      root.style.setProperty("--vt-x", cx + "px");
-      root.style.setProperty("--vt-y", cy + "px");
+      if (!document.startViewTransition || still) { switchTheme(); return; }
 
-      if (!document.startViewTransition || still) {
-        switchTheme();
-        return;
-      }
-      document.startViewTransition(switchTheme);
+      // radius to the farthest corner so the circle always covers the screen
+      const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+
+      root.classList.add("vt");                       // freeze CSS transitions during the swap
+      const vt = document.startViewTransition(switchTheme);
+
+      vt.ready.then(() => {
+        root.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          { duration: 650, easing: "cubic-bezier(.2,.9,.2,1)", pseudoElement: "::view-transition-new(root)" }
+        );
+      }).catch(() => {});
+
+      vt.finished.finally(() => root.classList.remove("vt"));
     });
 
     /* ---------- TESTIMONIALS ---------- */
@@ -2557,7 +2564,7 @@
         el.style.zIndex = n - d;
         el.style.opacity = d > 3 ? 0 : 1;
         el.style.pointerEvents = d > 3 ? "none" : "";
-        el.style.transform = d === 0 ? "rotate(-1deg)" : `translate(${s * d * 3.5}%, ${-d * 3}%) rotate(${s * d * 2.4}deg) scale(${1 - d * .03})`;
+        el.style.transform = d === 0 ? "rotate(-1deg)" : `translate(${s * d * (innerWidth < 860 ? 1.5 : 3.5)}%, ${-d * 3}%) rotate(${s * d * (innerWidth < 860 ? 1.2 : 2.4)}deg) scale(${1 - d * .03})`;
         el.classList.toggle("act", d === 0);
       });
       certRows.forEach((r, k) => { r.classList.toggle("on", k === i); r.setAttribute("aria-current", String(k === i)); });
