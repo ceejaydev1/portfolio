@@ -1243,8 +1243,8 @@ section { overflow-x: clip; }
       position: absolute; top: -1px; bottom: -1px; left: 0; right: -1px;
       transform: scaleY(0); transform-origin: 50% 100%;
     }
-    .sl .s1 { background: var(--acc); --o: 0ms; --o2: 130ms; }
-    .sl .s2 { background: var(--ink); --o: 130ms; --o2: 0ms; }
+    .sl .s1 { background: color-mix(in srgb, var(--acc) 70%, var(--bg)); --o: 0ms; --o2: 130ms; }
+    .sl .s2 { background: var(--card); --o: 130ms; --o2: 0ms; }
     #shutter.cover .sl i {
       transform: scaleY(1);
       transition: transform .55s cubic-bezier(.7, 0, .2, 1) calc(var(--i) * 38ms + var(--o));
@@ -1256,7 +1256,7 @@ section { overflow-x: clip; }
     .sh-mid {
       position: absolute; inset: 0; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 6px;
-      color: var(--bg); opacity: 0; transition: opacity .25s; pointer-events: none;
+      color: var(--ink); opacity: 0; transition: opacity .25s; pointer-events: none;
     }
     #shutter.mid .sh-mid { opacity: 1; }
     .sh-cap {
@@ -1559,92 +1559,104 @@ section { overflow-x: clip; }
     </section>
 
     <section id="skills">
+      <style>
+        .kx-bar { display: flex; justify-content: space-between; align-items: center; gap: 18px 28px; flex-wrap: wrap; margin: clamp(36px, 5vw, 64px) 0 10px; }
+        .kx-g { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .kx-k { font-size: 14px; color: var(--mut); margin-right: 4px; }
+        .kx-seg { display: flex; gap: 4px; padding: 4px; border: 1.5px solid var(--line); border-radius: 99px; max-width: 100%; overflow-x: auto; }
+        .kx-seg button { border: 0; background: none; color: var(--mut); cursor: pointer; white-space: nowrap; padding: 7px 16px; border-radius: 99px; font-weight: 600; font-size: 14px; display: inline-flex; gap: 6px; align-items: baseline; transition: background .3s, color .3s; }
+        .kx-seg button sup { font-size: 11px; font-weight: 500; opacity: .65; }
+        .kx-seg button:hover { color: var(--ink); }
+        .kx-seg button.on { background: var(--ink); color: var(--bg); }
+        .kx-pj button { padding: 6px 14px; border-radius: 99px; border: 1.5px solid var(--line); background: none; color: var(--ink); cursor: pointer; font-size: 14px; transition: background .25s, color .25s, border-color .25s; }
+        .kx-pj button:hover { border-color: var(--acc); }
+        .kx-pj button.on { background: var(--acc); border-color: var(--acc); color: #fff; }
+        .kx-meta { margin: 0 0 clamp(20px, 3vw, 32px); min-height: 1.6em; font-size: 14px; color: var(--mut); }
+
+        .kx-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+        .kx-cat { padding: clamp(26px, 3.4vw, 40px) clamp(18px, 2.6vw, 36px) clamp(18px, 2.4vw, 30px); border-left: 1.5px solid var(--line); }
+        .kx-cat:first-child { border-left: 0; padding-left: 0; }
+        .kx-cat:last-child { padding-right: 0; }
+        .kx-h { margin-bottom: 14px; }
+        .kx-h h3 { margin: 0; font: 700 clamp(26px, 2.8vw, 38px)/1.05 "Bricolage Grotesque", system-ui, sans-serif; letter-spacing: -.035em; }
+        .kx-n { font-size: 13px; font-weight: 600; color: var(--acc); letter-spacing: .08em; }
+        .kx-c { margin: 0 0 6px; font-size: 13px; color: var(--mut); letter-spacing: .12em; text-transform: uppercase; }
+        .kx-l { list-style: none; margin: 0; padding: 0; }
+        .kx-i { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; row-gap: 4px; align-items: end; padding: 15px 0 14px; border-top: 1.5px solid var(--line); transition: opacity .45s var(--ease), padding .45s var(--ease), border-color .3s; }
+        .kx-i:hover { padding-left: 10px; border-color: var(--ink); }
+        .kx-i.off { opacity: .15; }
+        .kx-nm { font: 600 clamp(18px, 1.7vw, 21px)/1.2 "Bricolage Grotesque", system-ui, sans-serif; letter-spacing: -.015em; transition: color .3s; }
+        .kx-i:hover .kx-nm { color: var(--acc); }
+        .kx-p { display: flex; align-items: flex-end; gap: 3px; height: 24px; justify-self: end; }
+        .kx-p b { width: 7px; height: calc(7px + var(--k) * 3.4px); border-radius: 2px; background: var(--line); }
+        .kx-p b.f { background: var(--acc); }
+        .kx-i.ln .kx-p b.f { background: repeating-linear-gradient(135deg, var(--acc) 0 2px, transparent 2px 4px); box-shadow: inset 0 0 0 1.5px var(--acc); }
+        .kx-tg { font-size: 13.5px; color: var(--mut); min-height: 1.3em; }
+        .kx-w { grid-column: 2; display: inline-flex; align-items: center; gap: 7px; justify-self: end; font-size: 13.5px; color: var(--mut); }
+        .kx-d { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: blink 1.8s ease-in-out infinite; }
+        .js .kx-p b { transform: scaleY(0); transform-origin: 50% 100%; transition: transform .7s var(--ease); transition-delay: calc(var(--j, 0) * 60ms + var(--k) * 70ms + 250ms); }
+        .js .kx-cat.in .kx-p b { transform: none; }
+
+        @media (max-width: 960px) {
+          .kx-cols { grid-template-columns: minmax(0, 1fr); border-bottom: 0; }
+          .kx-cat, .kx-cat:first-child, .kx-cat:last-child { padding: 28px 0 8px; border-left: 0; border-bottom: 1.5px solid var(--line); }
+          .kx-cat:last-child { border-bottom: 1.5px solid var(--ink); }
+        }
+      </style>
+
       <div class="wrap"><h2 class="rv">Skills</h2></div>
       <div class="mq" aria-hidden="true">
         <div class="mq-t">
           <span>HTML</span><span>CSS</span><span>JavaScript</span><span>TypeScript</span>
-          <span>React</span><span>Next.js</span><span>Tailwind</span><span>Node.js</span>
+          <span>React</span><span>Next.js</span><span>Tailwind</span><span>Node.js</span><span>PHP</span><span>Laravel</span><span>Python</span><span>Dart</span>
         </div>
       </div>
       <div class="mq rev" aria-hidden="true">
         <div class="mq-t">
           <span>PostgreSQL</span><span>MySQL</span><span>Supabase</span><span>REST APIs</span>
-          <span>Git</span><span>Figma</span><span>Linux</span><span>Networking</span>
+          <span>Git</span><span>Figma</span><span>Linux</span><span>Laragon</span><span>Networking</span>
         </div>
       </div>
-      <div class="wrap">
-        <div class="sk">
-          <div class="rv" style="--d:0">
-            <article class="card">
-              <h3>Frontend <small>01</small></h3>
-              <ul>
-                <li style="--l:.92;--i:0">
-                  <div class="lv-top"><span>HTML, CSS, JavaScript</span><em>Strong</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.78;--i:1">
-                  <div class="lv-top"><span>React and Next.js</span><em>Comfortable</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.85;--i:2">
-                  <div class="lv-top"><span>Tailwind CSS</span><em>Strong</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.82;--i:3">
-                  <div class="lv-top"><span>Responsive and accessible UI</span><em>Strong</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-              </ul>
-            </article>
-          </div>
-          <div class="rv" style="--d:1">
-            <article class="card">
-              <h3>Backend and data <small>02</small></h3>
-              <ul>
-                <li style="--l:.72;--i:0">
-                  <div class="lv-top"><span>Node.js</span><em>Comfortable</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.74;--i:1">
-                  <div class="lv-top"><span>PostgreSQL and MySQL</span><em>Comfortable</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.78;--i:2">
-                  <div class="lv-top"><span>Supabase</span><em>Comfortable</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.74;--i:3">
-                  <div class="lv-top"><span>REST APIs</span><em>Comfortable</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-              </ul>
-            </article>
-          </div>
-          <div class="rv" style="--d:2">
-            <article class="card">
-              <h3>Tools <small>03</small></h3>
-              <ul>
-                <li style="--l:.8;--i:0">
-                  <div class="lv-top"><span>Git and GitHub</span><em>Strong</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.62;--i:1">
-                  <div class="lv-top"><span>Figma</span><em>Comfortable</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.45;--i:2">
-                  <div class="lv-top"><span>Linux basics</span><em>Learning</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-                <li style="--l:.5;--i:3">
-                  <div class="lv-top"><span>Networking basics</span><em>Learning</em></div>
-                  <div class="lv-bar"><i></i></div>
-                </li>
-              </ul>
-            </article>
-          </div>
-        </div>
-      </div>
+      <div class="wrap"><div class="kx" id="kx"></div></div>
+
+      <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const DATA = [
+      { t: "Frontend", items: [
+        ["HTML, CSS, JavaScript", 5, "Strong"],
+        ["React and Next.js", 4, "Comfortable"],
+        ["Tailwind CSS", 4, "Strong"],
+        ["Responsive and accessible UI", 4, "Strong"],
+        ["Dart and Flutter", 3, "Comfortable"]
+      ]},
+      { t: "Backend and data", items: [
+        ["Node.js", 3, "Comfortable"],
+        ["PostgreSQL and MySQL", 4, "Comfortable"],
+        ["Supabase", 4, "Comfortable"],
+        ["REST APIs", 4, "Comfortable"],
+        ["PHP", 3, "Comfortable"],
+        ["Laravel", 2, "Learning"],
+        ["Python", 1, "Learning"]
+      ]},
+      { t: "Tools", items: [
+        ["Git and GitHub", 4, "Strong"],
+        ["Figma", 3, "Comfortable"],
+        ["Laragon", 3, "Comfortable"],
+        ["Linux basics", 2, "Learning"],
+        ["Networking basics", 2, "Learning"]
+      ]}
+    ];
+    const box = document.getElementById("kx");
+    if (!box) return;
+    const item = (it, j) => `<li class="kx-i${it[2] === "Learning" ? " ln" : ""}" style="--j:${j}">
+        <span class="kx-nm">${it[0]}</span>
+        <span class="kx-p" role="img" aria-label="${it[1]} out of 5">${[1, 2, 3, 4, 5].map(k => `<b class="${k <= it[1] ? "f" : ""}" style="--k:${k}"></b>`).join("")}</span>
+        <span class="kx-w">${it[2] === "Learning" ? '<i class="kx-d"></i>' : ""}${it[2]}</span>
+      </li>`;
+    box.innerHTML = `<div class="kx-cols">${DATA.map((c, ci) => `<div class="kx-cat rv" style="--d:${ci}"><div class="kx-h"><h3>${c.t}</h3></div><ul class="kx-l">${c.items.map((it, j) => item(it, j)).join("")}</ul></div>`).join("")}</div>`;
+    box.querySelectorAll(".kx-cat").forEach(el => io.observe(el));
+  });
+</script>
     </section>
 
     <section id="path">
@@ -1667,14 +1679,14 @@ section { overflow-x: clip; }
             </div>
           </div>
           <div class="ti">
-            <div class="yr">2023</div>
+            <div class="yr">2024</div>
             <div class="it">
               <h3>First full-stack project</h3>
               <p>Built a database-driven site for a class and kept going.</p>
             </div>
           </div>
           <div class="ti">
-            <div class="yr">2022</div>
+            <div class="yr">2023</div>
             <div class="it">
               <h3>Started BS Information Technology</h3>
               <p>My first HTML page took a whole weekend and got me hooked.</p>
@@ -2540,7 +2552,8 @@ section { overflow-x: clip; }
       { t: "JavaScript Essentials 1 (JSE)", kind: "Completion", by: "Cisco Networking Academy", y: 2023, id: "0002", h: 160, img: "C2.png" },
       { t: "Introduction to Cybersecurity", kind: "Completion", by: "Cisco Networking Academy", y: 2026, id: "0003", h: 20, img: "C3.png" },
       { t: "CCNAv7: Introduction to Networks", kind: "Completion", by: "Cisco Networking Academy", y: 2024, id: "0004", h: 330, img: "C4.png" },
-      { t: "CCNA: Switching, Routing, and Wireless Essentials", kind: "Completion", by: "Cisco Networking Academy", y: 2025, id: "0005", h: 280, img: "C5.png" }
+      { t: "CCNA: Switching, Routing, and Wireless Essentials", kind: "Completion", by: "Cisco Networking Academy", y: 2025, id: "0005", h: 280, img: "C5.png" },
+      { t: "CCNA: Enterprise Networking, Security, and Automation", kind: "Completion", by: "Cisco Networking Academy", y: 2026, id: "0006", h: 100, img: "C6.png" }
     ];
     const csStage = $("#csStage"), csList = $("#csList"), cz = $("#cz"), czBox = $("#czBox");
     const certFace = c => c.img
@@ -2627,6 +2640,16 @@ section { overflow-x: clip; }
       ["Client / creative mode switch", .35, "Building"],
       ["Reviews and payments", .08, "Planned"]
     ];
+    const IK = [
+      ["Calmer entry editor", .6, "In progress"],
+      ["Firebase sync tune-up", .8, "Testing"],
+      ["Fresh look, light and dark", .2, "Queued"]
+    ];
+    const buildLog = (rows, next) => `<div class="bp">
+        <div class="bp-h"><span>Build progress</span><span>Updated ${monthYear}</span></div>
+        ${rows.map(([n, l, s], i) => `<div class="bp-r" style="--l:${l};--i:${i}"><div class="lv-top"><span>${n}</span><em>${s}</em></div><div class="lv-bar"><i></i></div></div>`).join("")}
+        <p class="bp-t">&gt; next up: ${next}<span class="cur"></span></p>
+      </div>`;
     const DEMOS = {
       photobook: {
         k: "PhotoBook · Build log", t: "Under development",
@@ -2641,23 +2664,8 @@ section { overflow-x: clip; }
           </div>`
       },
       inkwave: {
-        k: "Inkwave · Dart, Flutter, Firebase", t: "Updating",
-        html: () => `<div class="dy"><span class="dy-rib">Updating</span><div class="dy-pg">
-            <span class="dy-d">${dayLong}</span>
-            <p class="dy-l" style="--i:0">Dear reader,</p>
-            <p class="dy-l" style="--i:1">Inkwave is between chapters. I'm rewriting a few pages so the next entry feels better to write.</p>
-            <ul>
-              <li class="dy-l" style="--i:2"><span>A calmer entry editor</span><em>in progress</em></li>
-              <li class="dy-l" style="--i:3"><span>Firebase sync tune-up</span><em>testing</em></li>
-              <li class="dy-l" style="--i:4"><span>Fresh look, light and dark</span><em>queued</em></li>
-            </ul>
-            <p class="dy-l dy-sig" style="--i:5">Back soon. – ${ME.first}</p>
-            <i class="dy-blot"></i>
-          </div></div>
-          <div class="dm-act">
-            <a class="btn" href="${mailTo("Inkwave update")}">Tell me when it's back</a>
-            <button class="btn o" type="button" data-dmx>Back to the site</button>
-          </div>`
+        k: "Inkwave · Update log", t: "Updating",
+        html: () => buildLog(IK, "entry editor polish") + '<div class="dm-act"><a class="btn" href="' + mailTo("Inkwave update") + '">Tell me when it\'s back</a><button class="btn o" type="button" data-dmx>Back to the site</button></div>'
       }
     };
     const dmShell = () => [$("main"), $("header"), $("footer")];
