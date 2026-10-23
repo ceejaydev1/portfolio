@@ -1190,7 +1190,13 @@ section { overflow-x: clip; }
       #toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
     }
 
-    /* ================= BACK TO TOP ================= */
+    /* ================= RESUME VIEWER ================= */
+.rs-panel { display: flex; flex-direction: column; width: min(920px, 100%); height: min(900px, 100%); overflow: hidden; }
+.rs-act { display: flex; align-items: center; gap: 10px; }
+.rs-act .btn { padding: 9px 18px; font-size: 14px; }
+.rs-frame { flex: 1; width: 100%; border: 0; background: var(--card); }
+
+/* ================= BACK TO TOP ================= */
     .totop {
       font: inherit; color: var(--ink); cursor: pointer; text-decoration: none;
       background: none; border: 0; padding: 0; display: inline-flex; align-items: center; gap: 14px;
@@ -1755,7 +1761,8 @@ section { overflow-x: clip; }
           <button class="btn" id="copy" data-mag>Copy email</button>
           <a class="btn o" href="https://github.com/ceejaydev1" target="_blank" rel="noopener" data-mag>GitHub</a>
           <a class="btn o" href="#" data-mag>LinkedIn</a>
-          <a class="btn o" href="#" data-mag>Download resume</a>
+          <button class="btn o" type="button" id="resView" data-mag>View resume</button>
+          <a class="btn o" href="Resume.pdf" download="Ceejay-Estabillo-Resume.pdf" data-mag>Download resume</a>
         </div>
         <form id="f" class="rv">
           <div class="fg">
@@ -1851,7 +1858,21 @@ section { overflow-x: clip; }
     <div class="dk-r" id="dkR" role="group" aria-label="React to this portfolio"></div>
   </aside>
 
-  <div id="toast" role="status"></div>
+  <div class="dm" id="rs" role="dialog" aria-modal="true" aria-labelledby="rsTitle" aria-hidden="true" inert>
+  <div class="dm-bd" data-rsx></div>
+  <div class="dm-panel rs-panel">
+    <div class="dm-top">
+      <div><div class="dm-k">Résumé · PDF</div><h3 id="rsTitle">Ceejay Estabillo</h3></div>
+      <div class="rs-act">
+        <a class="btn" href="Resume.pdf" download="Ceejay-Estabillo-Resume.pdf">Download</a>
+        <button class="fun-x" type="button" data-rsx aria-label="Close">&times;</button>
+      </div>
+    </div>
+    <iframe class="rs-frame" id="rsFrame" title="Ceejay Estabillo resume"></iframe>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
 
   <script>
     /* ---------- CORE ---------- */
@@ -2786,7 +2807,33 @@ section { overflow-x: clip; }
       }, 6000);
     })();
 
-    /* ---------- toast, copy, form ---------- */
+    /* ---------- RESUME viewer ---------- */
+const rs = $("#rs"), rsFrame = $("#rsFrame"), RESUME = "Resume.pdf";
+const rsShell = () => [$("main"), $("header"), $("footer")];
+function openRs() {
+  /* phones can't render PDFs in an iframe, so open the native viewer instead */
+  if (matchMedia("(pointer:coarse)").matches || innerWidth < 760) {
+    window.open(RESUME, "_blank", "noopener");
+    return;
+  }
+  if (menuOpen) setMenu(false);
+  if (!rsFrame.getAttribute("src")) rsFrame.src = RESUME + "#view=FitH";
+  rs.classList.add("open"); rs.inert = false; rs.setAttribute("aria-hidden", "false");
+  rsShell().forEach(el => el.inert = true);
+  root.style.overflow = "hidden";
+  setTimeout(() => rs.querySelector(".fun-x").focus({ preventScroll: true }), 120);
+}
+function closeRs() {
+  rs.classList.remove("open"); rs.inert = true; rs.setAttribute("aria-hidden", "true");
+  rsShell().forEach(el => el.inert = false);
+  root.style.overflow = "";
+  $("#resView").focus({ preventScroll: true });
+}
+$("#resView").addEventListener("click", openRs);
+rs.addEventListener("click", e => { if (e.target.closest("[data-rsx]")) closeRs(); });
+addEventListener("keydown", e => { if (e.key === "Escape" && rs.classList.contains("open")) closeRs(); });
+
+/* ---------- toast, copy, form ---------- */
     const toast = m => {
       const t = $("#toast");
       t.textContent = m;
